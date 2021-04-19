@@ -1,5 +1,3 @@
-import 'package:intl/intl.dart';
-
 import 'package:gmaps_scraper_app/src/exceptions/LicenseKeyException.dart';
 
 enum LicenseKeyType {
