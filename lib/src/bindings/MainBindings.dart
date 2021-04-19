@@ -9,6 +9,7 @@ class MainBindings extends Bindings {
   @override
   void dependencies() {
     Get.put(MainController());
+
     Get.lazyPut(() => HomeController(Get.find<DbService>()));
     Get.lazyPut(() => ResultController(Get.find<DbService>()));
   }

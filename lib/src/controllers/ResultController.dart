@@ -47,8 +47,8 @@ class ResultController extends GetxController {
     );
 
     await Future.wait([
-      loadC(),
       loadK(),
+      loadC(),
     ]);
   }
 
@@ -91,9 +91,9 @@ class ResultController extends GetxController {
   Future<void> loadC() async {
     try {
       await db.query('cities').then((List<Map<String, Object?>> _results) {
-        _results.forEach((Map<String, Object?> city) {
-          cities.clear();
+        cities.clear();
 
+        _results.forEach((Map<String, Object?> city) {
           cities.add(
             City(
               id: (city['id'] as int),

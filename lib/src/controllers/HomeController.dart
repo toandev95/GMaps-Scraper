@@ -82,6 +82,15 @@ class HomeController extends GetxController {
       );
     }
 
+    debounce(
+      logs,
+      (List<LogItem> ls) {
+        scrollController.jumpTo(
+          scrollController.position.maxScrollExtent,
+        );
+      },
+    );
+
     logs.add(
       LogItem.info('Sẵn sàng quét và lưu trữ.'),
     );

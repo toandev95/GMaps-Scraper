@@ -1,30 +1,49 @@
+import 'package:intl/intl.dart';
+
 import 'package:gmaps_scraper_app/src/exceptions/LicenseKeyException.dart';
 
+enum LicenseKeyType {
+  TRIAL,
+  PREMIUM,
+}
+
 class LicenseKey {
-  final String? fullName;
-  final String? email;
-  final String? deviceId;
-  final DateTime? expiryDate;
+  String? fullName;
+  String? email;
+  String? deviceId;
+  DateTime? expiryDate;
+  LicenseKeyType? type;
 
   LicenseKey({
     this.fullName,
     this.email,
     this.deviceId,
     this.expiryDate,
+    this.type,
   });
 
   static LicenseKey fromString(String val) {
     final List<String> ls = val.split('|');
 
-    if (ls.length != 4) {
+    if (ls.length != 5) {
       throw LicenseKeyException();
     }
 
     return LicenseKey(
-      fullName: ls[0],
-      email: ls[1],
-      deviceId: ls[2],
+      deviceId: ls[0],
+      fullName: ls[1],
+      email: ls[2],
       expiryDate: DateTime.tryParse(ls[3])?.toLocal(),
+      type: ls[4] == 'premium' ? LicenseKeyType.PREMIUM : LicenseKeyType.TRIAL,
     );
+  }
+
+  Map<String, String> toMapSQL() {
+    return {
+      'device_id': deviceId!,
+      'full_name': fullName!,
+      'email': email!,
+      'expiry_date': DateFormat('yyyy-MM-dd HH:mm:ss').format(expiryDate!),
+    };
   }
 }

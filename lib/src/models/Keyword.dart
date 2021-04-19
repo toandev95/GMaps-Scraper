@@ -1,6 +1,6 @@
 class Keyword {
-  final int? id;
-  final String? name;
+  int? id;
+  String? name;
 
   Keyword({
     this.id,

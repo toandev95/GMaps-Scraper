@@ -5,9 +5,9 @@ enum LogLevel {
 }
 
 class LogItem {
-  final LogLevel level;
-  final String? message;
-  final DateTime? logAt;
+  LogLevel level;
+  String? message;
+  DateTime? logAt;
 
   LogItem({
     this.level = LogLevel.INFO,

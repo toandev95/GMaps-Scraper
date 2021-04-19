@@ -16,6 +16,7 @@ class Result {
   DateTime? createdAt;
 
   Result({
+    this.keywordId,
     this.cityId,
     this.url,
     this.imageUrl,
