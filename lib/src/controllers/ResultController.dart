@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:excel/excel.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:sqflite_common/sqlite_api.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:rome_bus/rome_bus.dart';
@@ -17,13 +19,13 @@ import 'package:gmaps_scraper_app/src/services/DbService.dart';
 class ResultController extends GetxController {
   final RxBool exporting = false.obs;
 
+  final RxString path = ''.obs;
+
   final RxList<City> cities = <City>[].obs;
   final RxList<Keyword> keywords = <Keyword>[].obs;
 
   Rx<City>? city;
   Rx<Keyword>? keyword;
-
-  final RxString path = ''.obs;
 
   DbService dbService;
 
@@ -34,11 +36,7 @@ class ResultController extends GetxController {
 
   Database get db => dbService.instance!;
 
-  bool get ready => super.initialized && path.value.isNotEmpty;
-
-  bool get lauched => super.initialized && exporting.value;
-
-  bool get picked => super.initialized && path.value.isNotEmpty;
+  bool get lauched => super.initialized && exporting();
 
   @override
   void onInit() async {
@@ -68,8 +66,8 @@ class ResultController extends GetxController {
           );
         });
 
-        if (keywords.length > 0) {
-          keyword = keywords.first.obs;
+        if (keywords().length > 0) {
+          keyword = keywords().first.obs;
         }
       });
     } catch (e) {
@@ -94,7 +92,7 @@ class ResultController extends GetxController {
     try {
       await db.query('cities').then((List<Map<String, Object?>> _results) {
         _results.forEach((Map<String, Object?> city) {
-          keywords.clear();
+          cities.clear();
 
           cities.add(
             City(
@@ -104,8 +102,8 @@ class ResultController extends GetxController {
           );
         });
 
-        if (cities.length > 0) {
-          city = cities.first.obs;
+        if (cities().length > 0) {
+          city = cities().first.obs;
         } else {
           throw Error();
         }
@@ -129,19 +127,27 @@ class ResultController extends GetxController {
   }
 
   void pick() async {
+    final String _fileName = DateFormat('d-M-y').format(DateTime.now());
     final String? _path = await getSavePath(
+      suggestedName: '$_fileName.xlsx',
       acceptedTypeGroups: [
         XTypeGroup(
           extensions: ['xlsx'],
         ),
       ],
+      confirmButtonText: 'Chọn',
     );
 
-    path.value = _path != null ? _path : '';
+    path(_path != null ? _path : '');
   }
 
   void export() async {
-    exporting.value = true;
+    exporting(true);
+
+    await EasyLoading.show(
+      status: 'Đang xử lý xữ liệu ...',
+      maskType: EasyLoadingMaskType.black,
+    );
 
     try {
       final List<Map<String, Object?>> _results = await db.rawQuery(
@@ -200,25 +206,21 @@ class ResultController extends GetxController {
         }),
       );
 
-      await File(path.value).writeAsBytes(_excel.encode()!);
+      await File(path()).writeAsBytes(_excel.encode()!);
 
       await Future.delayed(
         Duration(
-          seconds: 2,
+          seconds: 1,
         ),
       );
 
-      Get.rawSnackbar(
-        message: 'Đã xuất dữ liệu thành công.',
-      );
+      await EasyLoading.showSuccess('Đã xuất dữ liệu thành công.');
     } catch (e) {
       print(e);
 
-      Get.rawSnackbar(
-        message: 'Không thể xuất dữ liệu.',
-      );
+      await EasyLoading.showError('Không thể xuất dữ liệu.');
     } finally {
-      exporting.value = false;
+      exporting(false);
     }
   }
 }

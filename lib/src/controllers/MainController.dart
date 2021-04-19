@@ -5,22 +5,21 @@ class MainController extends GetxController {
   final RxInt tabIndex = 0.obs;
 
   void tab(int index) {
-    tabIndex.value = index;
+    tabIndex(index);
 
     Get.back();
   }
 
   void zalo() async {
+    Get.back();
+
     try {
       final String _zalo = 'https://zalo.me/0849181883';
 
       if (await canLaunch(_zalo)) {
         await launch(_zalo);
       }
-
-      Get.back();
     } catch (e) {
-      Get.back();
       Get.rawSnackbar(
         message: 'Không thể mở liên kết.',
       );

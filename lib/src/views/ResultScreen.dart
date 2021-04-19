@@ -26,16 +26,15 @@ class ResultScreen extends GetView<ResultController> {
               decoration: InputDecoration(
                 labelText: 'Từ khoá',
               ),
-              value:
-                  controller.keyword != null ? controller.keyword!.value : null,
-              items: controller.keywords.map((Keyword item) {
+              value: controller.keyword != null ? controller.keyword!() : null,
+              items: controller.keywords().map((Keyword item) {
                 return DropdownMenuItem(
                   value: item,
                   child: Text(item.name!),
                 );
               }).toList(),
               onChanged: !controller.lauched
-                  ? (Keyword? val) => controller.keyword!.value = val!
+                  ? (Keyword? val) => controller.keyword!(val!)
                   : null,
             ),
             SizedBox(
@@ -45,15 +44,15 @@ class ResultScreen extends GetView<ResultController> {
               decoration: InputDecoration(
                 labelText: 'Khu vực',
               ),
-              value: controller.city != null ? controller.city!.value : null,
-              items: controller.cities.map((City item) {
+              value: controller.city != null ? controller.city!() : null,
+              items: controller.cities().map((City item) {
                 return DropdownMenuItem(
                   value: item,
                   child: Text(item.name!),
                 );
               }).toList(),
               onChanged: !controller.lauched
-                  ? (City? val) => controller.city!.value = val!
+                  ? (City? val) => controller.city!(val!)
                   : null,
             ),
             SizedBox(
@@ -62,13 +61,13 @@ class ResultScreen extends GetView<ResultController> {
             Row(
               children: [
                 Expanded(
-                  child: controller.picked
+                  child: controller.path().isNotEmpty
                       ? Text.rich(
                           TextSpan(
                             text: 'Nơi lưu: ',
                             children: [
                               TextSpan(
-                                text: controller.path.value,
+                                text: controller.path(),
                                 style: TextStyle(
                                   decoration: TextDecoration.underline,
                                 ),
@@ -83,9 +82,7 @@ class ResultScreen extends GetView<ResultController> {
                 ),
                 ElevatedButton(
                   child: Text('Chọn'),
-                  onPressed: !controller.lauched && !controller.lauched
-                      ? () => controller.pick()
-                      : null,
+                  onPressed: !controller.lauched ? controller.pick : null,
                 ),
               ],
             ),
@@ -96,7 +93,7 @@ class ResultScreen extends GetView<ResultController> {
               alignment: Alignment.topLeft,
               child: ElevatedButton(
                 child: Text('Xuất Excel'),
-                onPressed: controller.ready && !controller.lauched
+                onPressed: controller.path().isNotEmpty && !controller.lauched
                     ? () => controller.export()
                     : null,
               ),

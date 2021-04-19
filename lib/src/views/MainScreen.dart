@@ -29,13 +29,13 @@ class MainScreen extends GetView<MainController> {
                 child: ListView(
                   children: [
                     ListTile(
-                      selected: controller.tabIndex.value == 0,
+                      selected: controller.tabIndex() == 0,
                       leading: Icon(Icons.map_rounded),
                       title: Text('Quét bản đồ'),
                       onTap: () => controller.tab(0),
                     ),
                     ListTile(
-                      selected: controller.tabIndex.value == 1,
+                      selected: controller.tabIndex() == 1,
                       leading: Icon(Icons.table_chart_rounded),
                       title: Text('Kết quả'),
                       onTap: () => controller.tab(1),
@@ -55,7 +55,7 @@ class MainScreen extends GetView<MainController> {
         ),
         body: Builder(
           builder: (_) {
-            switch (controller.tabIndex.value) {
+            switch (controller.tabIndex()) {
               case 1:
                 return ResultScreen();
               default:

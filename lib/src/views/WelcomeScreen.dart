@@ -51,7 +51,7 @@ class WelcomeScreen extends GetView<WelcomeController> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  controller.loading.value
+                  controller.loading()
                       ? Container(
                           width: 20.0,
                           height: 20.0,
@@ -63,31 +63,7 @@ class WelcomeScreen extends GetView<WelcomeController> {
                           ),
                         )
                       : SizedBox(),
-                  controller.error.isNotEmpty
-                      ? Container(
-                          margin: EdgeInsets.only(
-                            right: 10.0,
-                          ),
-                          child: Icon(
-                            Icons.warning_rounded,
-                            size: 20.0,
-                            color: Colors.red[600],
-                          ),
-                        )
-                      : SizedBox(),
-                  controller.error.isNotEmpty
-                      ? Text(
-                          controller.error.value,
-                          style: TextStyle(
-                            color: Colors.red[600],
-                          ),
-                        )
-                      : Text(
-                          'Đang kiểm tra bản quyền ...',
-                          style: TextStyle(
-                            color: Colors.black,
-                          ),
-                        ),
+                  Text(controller.message()),
                 ],
               ),
             ),

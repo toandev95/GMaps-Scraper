@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:flutter/material.dart' hide Page, Key;
 import 'package:sqflite_common/sqlite_api.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:rome_bus/rome_bus.dart';
@@ -20,13 +19,11 @@ class HomeController extends GetxController {
 
   final TextEditingController keywordCtrl = TextEditingController();
 
-  final RxString keyword = ''.obs;
+  final RxList<City> cities = <City>[].obs;
+  final RxList<LogItem> logs = <LogItem>[].obs;
 
   final RxString error = ''.obs;
   final RxBool scraping = false.obs;
-
-  final RxList<City> cities = <City>[].obs;
-  final RxList<LogItem> logs = <LogItem>[].obs;
 
   Browser? browser;
 
@@ -41,7 +38,7 @@ class HomeController extends GetxController {
 
   Database get db => dbService.instance!;
 
-  bool get lauched => super.initialized && scraping.value;
+  bool get lauched => super.initialized && scraping();
 
   @override
   void onInit() async {
@@ -50,26 +47,6 @@ class HomeController extends GetxController {
     logs.add(
       LogItem.info('Đang kiểm tra tương thích hệ thống.'),
     );
-
-    try {
-      await EasyLoading.show(
-        status: 'Đang tải trình thu thập.',
-        maskType: EasyLoadingMaskType.black,
-      );
-
-      // throw '123';
-      await downloadChrome();
-    } catch (e) {
-      print(e);
-
-      logs.add(
-        LogItem.error('Lỗi khi tải trình thu thập.'),
-      );
-
-      EasyLoading.showError('Không thể tải trình thu thập.');
-    } finally {
-      await EasyLoading.dismiss();
-    }
 
     try {
       await db.query('cities').then((List<Map<String, Object?>> _results) {
@@ -82,8 +59,8 @@ class HomeController extends GetxController {
           );
         });
 
-        if (cities.length > 0) {
-          city = cities.first.obs;
+        if (cities().length > 0) {
+          city = cities().first.obs;
         } else {
           throw Error();
         }
@@ -91,10 +68,6 @@ class HomeController extends GetxController {
     } catch (e) {
       print(e);
 
-      // logs.add(
-      //   LogItem.error('Sự cố phân tích cơ sở dữ liệu.'),
-      // );
-      //
       await Get.dialog(
         AlertDialog(
           content: Text('Sự cố phân tích cơ sở dữ liệu.'),
@@ -122,10 +95,10 @@ class HomeController extends GetxController {
   }
 
   void launch() async {
-    error.value = '';
+    error('');
 
     if (keywordCtrl.text.isEmpty) {
-      error.value = 'Chưa nhập từ khoá cần tìm!';
+      error('Chưa nhập từ khoá cần tìm!');
 
       return;
     }
@@ -134,7 +107,7 @@ class HomeController extends GetxController {
   }
 
   Future<void> close() async {
-    scraping.value = false;
+    scraping(false);
 
     await browser?.close();
     browser = null;
@@ -145,22 +118,24 @@ class HomeController extends GetxController {
   }
 
   Future<void> gmaps() async {
-    scraping.value = true;
+    scraping(true);
 
     logs.add(
       LogItem.info('Đang mở trình thu thập.'),
     );
 
     browser = await puppeteer.launch(
-      // headless: false,
+      headless: false,
       args: [
         // '--app=https://maps.google.com',
-        // '--window-size=1024,700',
+        '--window-size=1024,700',
         '--no-sandbox',
       ],
       defaultViewport: DeviceViewport(
         height: 3000,
         width: 1020,
+        hasTouch: true,
+        isMobile: true,
       ),
     );
 

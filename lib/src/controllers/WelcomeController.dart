@@ -1,9 +1,10 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:platform_device_id/platform_device_id.dart';
+import 'package:puppeteer/puppeteer.dart';
 
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:aes_crypt/aes_crypt.dart';
@@ -15,7 +16,7 @@ class WelcomeController extends GetxController {
   final AesCrypt crypt = AesCrypt();
 
   final RxBool loading = false.obs;
-  final RxString error = ''.obs;
+  final RxString message = ''.obs;
 
   String? deviceId;
 
@@ -23,14 +24,18 @@ class WelcomeController extends GetxController {
   void onInit() async {
     super.onInit();
 
-    loading.value = true;
+    loading(true);
 
     try {
+      message('Đang tải trình thu thập ...');
+      await downloadChrome();
+
+      message('Đang kiểm tra bản quyền ...');
       deviceId = await PlatformDeviceId.getDeviceId;
 
       crypt.setPassword('1234qwer');
+      crypt.setOverwriteMode(AesCryptOwMode.on);
 
-      // crypt.setOverwriteMode(AesCryptOwMode.on);
       // crypt.setUserData(
       //   createdBy: 'Toan Doan',
       // );
@@ -69,18 +74,18 @@ class WelcomeController extends GetxController {
       Get.offAllNamed('@main');
     } on AesCryptDataException catch (e) {
       if (e.message.contains('Incorrect password')) {
-        error.value = 'Không có quyền đọc khóa bản quyền!';
+        message('Không có quyền đọc khóa bản quyền!');
       }
     } on FileSystemException catch (e) {
       if (e.message.contains('Source file')) {
-        error.value = 'Không tìm thấy file khóa bản quyền!';
+        message('Không tìm thấy file khóa bản quyền!');
       }
     } on LicenseKeyException catch (e) {
-      error.value = e.message ?? 'Mã thiết bị không hợp lệ.';
+      message(e.message ?? 'Mã thiết bị không hợp lệ.');
     } on Exception catch (e) {
       print(e);
 
-      error.value = 'Không thể mở phần mềm, vui lòng liên hệ hỗ trợ.';
+      message('Không thể mở phần mềm, vui lòng liên hệ hỗ trợ.');
     } finally {
       loading.value = false;
     }

@@ -28,14 +28,13 @@ class HomeScreen extends GetView<HomeController> {
             children: [
               TextFormField(
                 controller: controller.keywordCtrl,
-                enabled: controller.initialized && !controller.lauched,
+                enabled: !controller.lauched,
                 decoration: InputDecoration(
                   labelText: 'Từ khoá quét',
-                  errorText: controller.error.value.isNotEmpty
-                      ? controller.error.value
-                      : null,
+                  errorText:
+                      controller.error().isNotEmpty ? controller.error() : null,
                 ),
-                onFieldSubmitted: controller.initialized && !controller.lauched
+                onFieldSubmitted: !controller.lauched
                     ? (String val) => controller.launch()
                     : null,
               ),
@@ -46,17 +45,15 @@ class HomeScreen extends GetView<HomeController> {
                 decoration: InputDecoration(
                   labelText: 'Khu vực tìm kiếm',
                 ),
-                value: controller.city != null ? controller.city!.value : null,
-                items: controller.cities.map((City item) {
+                value: controller.city != null ? controller.city!() : null,
+                items: controller.cities().map((City item) {
                   return DropdownMenuItem(
                     value: item,
                     child: Text(item.name!),
                   );
                 }).toList(),
                 onChanged: controller.initialized
-                    ? (City? val) {
-                        controller.city!.value = val!;
-                      }
+                    ? (City? val) => controller.city!(val!)
                     : null,
               ),
               SizedBox(
@@ -66,18 +63,14 @@ class HomeScreen extends GetView<HomeController> {
                 children: [
                   ElevatedButton(
                     child: Text('Chạy'),
-                    onPressed: controller.initialized && !controller.lauched
-                        ? () => controller.launch()
-                        : null,
+                    onPressed: !controller.lauched ? controller.launch : null,
                   ),
                   SizedBox(
                     width: 10.0,
                   ),
                   ElevatedButton(
                     child: Text('Dừng'),
-                    onPressed: controller.scraping.value && controller.lauched
-                        ? () => controller.close()
-                        : null,
+                    onPressed: controller.lauched ? controller.close : null,
                   ),
                 ],
               ),
@@ -94,18 +87,18 @@ class HomeScreen extends GetView<HomeController> {
                     controller: controller.scrollController,
                     // reverse: true,
                     padding: EdgeInsets.all(16.0),
-                    itemCount: controller.logs.length,
+                    itemCount: controller.logs().length,
                     itemBuilder: (_, int index) {
                       final String _logAt = DateFormat(
                         'yyyy-MM-dd HH:mm:ss',
                       ).format(
-                        controller.logs[index].logAt!,
+                        controller.logs()[index].logAt!,
                       );
 
                       String _level;
                       Color _color;
 
-                      switch (controller.logs[index].level) {
+                      switch (controller.logs()[index].level) {
                         case LogLevel.WARNING:
                           _level = 'CẢNH BÁO';
                           _color = Colors.lime;
@@ -130,7 +123,7 @@ class HomeScreen extends GetView<HomeController> {
                               text: '[$_logAt] ',
                             ),
                             TextSpan(
-                              text: controller.logs[index].message,
+                              text: controller.logs()[index].message,
                               style: TextStyle(
                                 color: Colors.white70,
                               ),
