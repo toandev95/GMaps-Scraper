@@ -37,13 +37,4 @@ class LicenseKey {
       type: ls[4] == 'premium' ? LicenseKeyType.PREMIUM : LicenseKeyType.TRIAL,
     );
   }
-
-  Map<String, String> toMapSQL() {
-    return {
-      'device_id': deviceId!,
-      'full_name': fullName!,
-      'email': email!,
-      'expiry_date': DateFormat('yyyy-MM-dd HH:mm:ss').format(expiryDate!),
-    };
-  }
 }
