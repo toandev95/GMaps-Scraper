@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:puppeteer/puppeteer.dart';
+import 'package:sqflite_common/sqlite_api.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 import 'package:gmaps_scraper_app/src/Controllers/Controllers.dart';
@@ -16,6 +17,8 @@ class MainController extends GetxController {
   final RxList<Province> listProvince = RxList<Province>.empty();
 
   User get currentUser => authController.currentUser.value!;
+
+  Database get db => databaseService.db!;
 
   @override
   void onInit() async {
@@ -34,7 +37,7 @@ class MainController extends GetxController {
   }
 
   Future<void> fechProvince() async {
-    await databaseService.db!.query('provinces').then(
+    await db.query('provinces').then(
       (List<Map<String, Object?>> results) {
         listProvince.addAll(results.map(Province.fromMap));
       },
@@ -52,7 +55,7 @@ class MainController extends GetxController {
           maskType: EasyLoadingMaskType.black,
           status: 'Đang truy xuất thông tin.',
         ),
-        databaseService.db!.query(
+        db.query(
           'districts',
           where: 'province_id = ?',
           whereArgs: [provinceId],
