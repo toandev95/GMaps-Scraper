@@ -1,3 +1,4 @@
-export 'AuthController.dart';
-export 'MainController.dart';
-export 'ScraperController.dart';
+export 'app_controller.dart';
+export 'tool_controller.dart';
+export 'result_controller.dart';
+export 'setting_controller.dart';

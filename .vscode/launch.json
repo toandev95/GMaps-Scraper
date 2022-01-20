@@ -5,11 +5,15 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "GMapsScraper",
-      "program": "lib/main.dart",
+      "name": "GoogleMapsScraper",
+      "request": "launch",
+      "type": "dart"
+    },
+    {
+      "name": "GoogleMapsScraper (profile mode)",
       "request": "launch",
       "type": "dart",
-      "args": ["--no-sound-null-safety"]
+      "flutterMode": "profile"
     }
   ]
 }

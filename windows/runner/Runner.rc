@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.idex" "\0"
-            VALUE "FileDescription", "Google Maps Data Scraper" "\0"
+            VALUE "CompanyName", "vn.idex.gmaps" "\0"
+            VALUE "FileDescription", "Công cụ thu thập dữ liệu địa điểm Google Maps." "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "GMaps Scraper" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2021 IDEX. All rights reserved." "\0"
-            VALUE "OriginalFilename", "GMapsScraper.exe" "\0"
-            VALUE "ProductName", "GMaps Scraper" "\0"
+            VALUE "InternalName", "Google Maps Scraper" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2022 IDEX. All rights reserved." "\0"
+            VALUE "OriginalFilename", "Google Maps Scraper.exe" "\0"
+            VALUE "ProductName", "Google Maps Scraper" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -1,44 +1,46 @@
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
-import 'package:gmaps_scraper_app/src/Controllers/Controllers.dart';
-import 'package:gmaps_scraper_app/src/UI/UI.dart';
+import 'package:google_maps_scraper_app/src/constants/constants.dart';
+import 'package:google_maps_scraper_app/src/controllers/controllers.dart';
+import 'package:google_maps_scraper_app/src/screens/screens.dart';
 
-class GMapsApp extends GetWidget<AuthController> {
+class GoogleMapsScraperApp extends GetWidget<AppController> {
+  const GoogleMapsScraperApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.system,
-      theme: ThemeData(
-        fontFamily: 'Roboto Mono',
-        primarySwatch: Colors.cyan,
-        scaffoldBackgroundColor: Colors.blueGrey[50],
-      ),
-      initialBinding: BindingsBuilder(() {
-        Get.put(AuthController());
-      }),
-      initialRoute: '@welcome',
-      getPages: [
+      theme: themeData,
+      initialRoute: RouteKeys.splash,
+      initialBinding: BindingsBuilder.put(() => AppController()),
+      getPages: <GetPage>[
         GetPage(
-          name: '@welcome',
-          page: () => WelcomeScreen(),
+          name: RouteKeys.splash,
+          page: () => const SplashScreen(),
         ),
         GetPage(
-          name: '@main',
-          page: () => MainScreen(),
-          binding: BindingsBuilder(() {
-            Get.lazyPut(() => MainController());
-            Get.lazyPut(() => ScraperController());
-          }),
+          name: RouteKeys.main,
+          page: () => const MainScreen(),
+          bindings: <Bindings>[
+            BindingsBuilder.put(() => ToolController()),
+            BindingsBuilder.put(() => ResultController()),
+            BindingsBuilder.put(() => SettingController()),
+          ],
         ),
       ],
-      onInit: () {
-        Intl.defaultLocale = 'vi';
-      },
-      builder: EasyLoading.init(),
+      builder: EasyLoading.init(
+        builder: (BuildContext context, Widget? child) {
+          EasyLoading.instance
+            ..dismissOnTap = true
+            ..displayDuration = 3.seconds
+            ..maskType = EasyLoadingMaskType.black;
+
+          return child!;
+        },
+      ),
     );
   }
 }
