@@ -52,7 +52,7 @@ class ResultScreen extends GetView<ResultController> {
                         .map(
                           (String? l) => DropdownMenuItem(
                             value: l,
-                            child: Text(l ?? 'Chung'),
+                            child: Text(l ?? 'Không đặt tên'),
                           ),
                         )
                         .toList(),
@@ -103,10 +103,6 @@ class ResultScreen extends GetView<ResultController> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Visibility(
-                      visible: false,
-                      child: Text(controller.currLabel.value ?? ''),
-                    ),
                     const Icon(
                       Icons.table_view_rounded,
                       color: Colors.grey,

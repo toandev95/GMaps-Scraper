@@ -1,55 +1,25 @@
-import 'package:hive/hive.dart';
+import 'package:sqlite3/sqlite3.dart';
 
-part 'result.g.dart';
-
-@HiveType(typeId: 0)
 class Result {
-  @HiveField(0)
+  int? id;
   String? key;
-
-  @HiveField(1)
   String? label;
-
-  @HiveField(2)
   String keyword;
-
-  @HiveField(3)
   String? title;
-
-  @HiveField(4)
   String? subTitle;
-
-  @HiveField(5)
   double? star;
-
-  @HiveField(6)
   int? totalReview;
-
-  @HiveField(7)
   String? categoryName;
-
-  @HiveField(8)
   List<String>? attributes;
-
-  @HiveField(9)
   String? address;
-
-  @HiveField(10)
   String? openHours;
-
-  @HiveField(11)
   String? websiteUrl;
-
-  @HiveField(12)
   String? phoneNumber;
-
-  @HiveField(13)
   String? imageUrl;
-
-  @HiveField(14)
   DateTime? createdAt;
 
   Result({
+    this.id,
     this.key,
     this.label,
     required this.keyword,
@@ -86,5 +56,26 @@ class Result {
       'image_url': imageUrl,
       'created_at': createdAt,
     };
+  }
+
+  static Result fromRow(Row row) {
+    return Result(
+      id: row['id'] as int,
+      key: row['key'],
+      label: row['label'],
+      keyword: row['keyword'],
+      title: row['title'],
+      subTitle: row['sub_title'],
+      star: row['star'] != null ? double.tryParse(row['star']) : null,
+      totalReview: row['total_review'],
+      categoryName: row['category_name'],
+      attributes: (row['attributes'] ?? '').split(','),
+      address: row['address'],
+      openHours: row['open_hours'],
+      websiteUrl: row['website_url'],
+      phoneNumber: row['phone_number'],
+      imageUrl: row['image_url'],
+      createdAt: DateTime.tryParse(row['created_at']),
+    );
   }
 }

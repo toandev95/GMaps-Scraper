@@ -13,4 +13,6 @@ extension IntlDateTimeFormat on DateTime {
     String? locale = 'vi',
   ]) =>
       DateFormat(newPattern, locale).format(this);
+
+  String toSQL() => format('yyyy-MM-dd hh:mm:ss');
 }

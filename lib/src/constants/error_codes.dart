@@ -1,3 +1,4 @@
 class ErrorCodes {
-  static int deviceIdNull = 1010;
+  static int initDeviceID = 1010;
+  static int initPackages = 1011;
 }

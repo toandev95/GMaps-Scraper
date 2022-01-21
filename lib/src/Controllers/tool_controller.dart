@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:crypto/crypto.dart';
+import 'package:google_maps_scraper_app/src/utils/extensions.dart';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:flutter/material.dart' hide Page, Key;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,6 +13,7 @@ import 'package:google_maps_scraper_app/src/constants/constants.dart';
 import 'package:google_maps_scraper_app/src/controllers/controllers.dart';
 import 'package:google_maps_scraper_app/src/screens/screens.dart';
 import 'package:google_maps_scraper_app/src/models/models.dart';
+import 'package:sqlite3/sqlite3.dart';
 
 class ToolController extends GetxController {
   final AppController appController = Get.find<AppController>();
@@ -381,16 +383,93 @@ class ToolController extends GetxController {
     }
 
     if (_result.title != null && _result.address != null) {
-      final String _key = md5
+      _result.key = md5
           .convert(utf8.encode('${_result.title!}+${_result.address}'))
           .toString();
 
-      await appController.resultBox.put(_key, _result);
+      final ResultSet _res = appController.db.select(
+        '''SELECT `id`
+        FROM `results`
+        WHERE `key` = "${_result.key}"
+        LIMIT 1''',
+      );
+
+      if (_res.rows.isEmpty) {
+        appController.db.prepare(
+          '''INSERT INTO `results`
+          (
+            `key`,
+            `label`,
+            `keyword`,
+            `title`,
+            `sub_title`,
+            `star`,
+            `total_review`,
+            `category_name`,
+            `attributes`,
+            `address`,
+            `open_hours`,
+            `website_url`,
+            `phone_number`,
+            `image_url`,
+            `created_at`
+          )
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+        ).execute([
+          _result.key,
+          _result.label,
+          _result.keyword,
+          _result.title,
+          _result.subTitle,
+          _result.star,
+          _result.totalReview,
+          _result.categoryName,
+          (_result.attributes ?? []).join(','),
+          _result.address,
+          _result.openHours,
+          _result.websiteUrl,
+          _result.phoneNumber,
+          _result.imageUrl,
+          DateTime.now().toSQL(),
+        ]);
+      } else {
+        appController.db.prepare(
+          '''UPDATE `results`
+          SET
+            `label` = ?,
+            `keyword` = ?,
+            `title` = ?,
+            `sub_title` = ?,
+            `star` = ?,
+            `total_review` = ?,
+            `category_name` = ?,
+            `attributes` = ?,
+            `address` = ?,
+            `open_hours` = ?,
+            `website_url` = ?,
+            `phone_number` = ?,
+            `image_url` = ?,
+            `updated_at` = ?
+          WHERE `key` = "${_result.key}"''',
+        ).execute([
+          _result.label,
+          _result.keyword,
+          _result.title,
+          _result.subTitle,
+          _result.star,
+          _result.totalReview,
+          _result.categoryName,
+          (_result.attributes ?? <String>[]).join(','),
+          _result.address,
+          _result.openHours,
+          _result.websiteUrl,
+          _result.phoneNumber,
+          _result.imageUrl,
+          DateTime.now().toSQL(),
+        ]);
+      }
 
       log('Lưu vào cơ sở dữ liệu vị trí #$currListItemIndex.');
-
-      // print(_key);
-      // print(_result.toJSON());
     }
 
     await page.goBack();
