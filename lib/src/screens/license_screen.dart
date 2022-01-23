@@ -4,42 +4,38 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_scraper_app/src/components/components.dart';
 import 'package:google_maps_scraper_app/src/controllers/controllers.dart';
 
-class ToolScreen extends GetView<ToolController> {
-  const ToolScreen({Key? key}) : super(key: key);
+class LicenseScreen extends StatefulWidget {
+  const LicenseScreen({Key? key}) : super(key: key);
+
+  @override
+  State<LicenseScreen> createState() => _LicenseScreenState();
+}
+
+class _LicenseScreenState extends State<LicenseScreen> {
+  final AppController appController = Get.find<AppController>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () {
-            Scaffold.of(context).openDrawer();
-          },
-        ),
-        title: Text('Công Cụ Thu Thập'.toUpperCase()),
+        title: const Text('Kích Hoạt Bản Quyền'),
       ),
       body: ListView(
         padding: const EdgeInsets.all(24.0),
         children: <Widget>[
           CustomTextField(
-            controller: controller.labelTextCtrl,
-            labelText: 'Thư mục',
+            controller: appController.emailTextCtrl,
+            labelText: 'Email',
+            isRequired: true,
           ),
           const SizedBox(
             height: 16.0,
           ),
           CustomTextField(
-            controller: controller.keywordTextCtrl,
-            labelText: 'Từ khóa tìm kiếm',
+            controller: appController.licenseTextCtrl,
             minLines: 4,
             maxLines: 6,
-            hintText: <String>[
-              'Ví dụ:',
-              'Quán cà phê gần Sài Gòn',
-              'Trà sữa gần Quận 7, Sài Gòn',
-            ].join('\n'),
+            labelText: 'Khóa bản quyền',
             isRequired: true,
           ),
           const SizedBox(
@@ -51,9 +47,9 @@ class ToolScreen extends GetView<ToolController> {
                 width: 140.0,
                 height: 38.0,
                 child: ElevatedButton(
-                  child: Text('Bắt đầu'.toUpperCase()),
+                  child: Text('Kích hoạt'.toUpperCase()),
                   onPressed: () {
-                    controller.handleRun();
+                    appController.handleActivation();
                   },
                 ),
               ),

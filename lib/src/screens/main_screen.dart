@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:google_maps_scraper_app/src/constants/constants.dart';
 import 'package:google_maps_scraper_app/src/controllers/controllers.dart';
+import 'package:google_maps_scraper_app/src/models/models.dart';
 import 'package:google_maps_scraper_app/src/screens/screens.dart';
 
 class MainScreen extends StatefulWidget {
@@ -17,6 +18,8 @@ class _MainScreenState extends State<MainScreen> {
   final AppController appController = Get.find<AppController>();
 
   int _currentIndex = 0;
+
+  LicenseKey get licenseKey => appController.licenseKey;
 
   String get appName => appController.packageInfo.appName;
   String get appVersion => appController.packageInfo.version;
@@ -51,8 +54,8 @@ class _MainScreenState extends State<MainScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             UserAccountsDrawerHeader(
-              accountName: Text(appName),
-              accountEmail: Text(appVersion),
+              accountName: Text(licenseKey.name),
+              accountEmail: Text(licenseKey.email),
             ),
             Expanded(
               child: ListView(

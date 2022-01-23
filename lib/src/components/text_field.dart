@@ -8,6 +8,7 @@ class CustomTextField extends StatelessWidget {
   final String? hintText;
   final int minLines;
   final int maxLines;
+  final bool isRequired;
 
   const CustomTextField({
     Key? key,
@@ -17,6 +18,7 @@ class CustomTextField extends StatelessWidget {
     this.hintText,
     this.minLines = 1,
     this.maxLines = 1,
+    this.isRequired = false,
   }) : super(key: key);
 
   @override
@@ -44,7 +46,18 @@ class CustomTextField extends StatelessWidget {
             color: Get.theme.primaryColor,
           ),
         ),
-        labelText: labelText,
+        // labelText: labelText,
+        label: Text.rich(
+          TextSpan(
+            text: labelText,
+            children: <TextSpan>[
+              if (isRequired)
+                const TextSpan(
+                  text: ' *',
+                ),
+            ],
+          ),
+        ),
         hintText: hintText,
         alignLabelWithHint: true,
       ),

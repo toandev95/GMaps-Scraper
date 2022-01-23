@@ -26,6 +26,7 @@ class SettingScreen extends GetView<SettingController> {
           CustomTextField(
             controller: controller.chromePathTextCtrl,
             labelText: 'Đường dẫn Chrome',
+            isRequired: true,
           ),
           const SizedBox(
             height: 16.0,
@@ -38,6 +39,7 @@ class SettingScreen extends GetView<SettingController> {
                   keyboardType: TextInputType.number,
                   labelText: 'Kết quả tối đa',
                   hintText: 'Số lượng kết quả tối đa thu thập / từ khóa.',
+                  isRequired: true,
                 ),
               ),
               const SizedBox(
@@ -49,6 +51,7 @@ class SettingScreen extends GetView<SettingController> {
                   keyboardType: TextInputType.number,
                   labelText: 'Giới hạn thời gian',
                   hintText: 'Dừng tìm kiếm nếu thời gian chờ lâu hơn.',
+                  isRequired: true,
                 ),
               ),
             ],
@@ -65,6 +68,7 @@ class SettingScreen extends GetView<SettingController> {
             height: 32.0,
           ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               SizedBox(
                 width: 140.0,
@@ -73,6 +77,17 @@ class SettingScreen extends GetView<SettingController> {
                   child: Text('Lưu lại'.toUpperCase()),
                   onPressed: () {
                     controller.handleSave();
+                  },
+                ),
+              ),
+              SizedBox(
+                width: 140.0,
+                height: 38.0,
+                child: TextButton.icon(
+                  icon: const Icon(Icons.delete),
+                  label: Text('Xóa dữ liệu'.toUpperCase()),
+                  onPressed: () {
+                    controller.handleReset();
                   },
                 ),
               ),

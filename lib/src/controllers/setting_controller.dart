@@ -1,15 +1,16 @@
 import 'dart:io';
 
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 import 'package:google_maps_scraper_app/src/constants/constants.dart';
 import 'package:google_maps_scraper_app/src/controllers/controllers.dart';
 
 class SettingController extends GetxController {
   final AppController appController = Get.find<AppController>();
+  final ResultController resultController = Get.find<ResultController>();
 
   final TextEditingController chromePathTextCtrl = TextEditingController();
   final TextEditingController maxResultTextCtrl = TextEditingController();
@@ -64,6 +65,46 @@ class SettingController extends GetxController {
       );
 
       await EasyLoading.showSuccess('Đã lưu thông tin cấu hình!');
+    }
+  }
+
+  void handleReset() async {
+    final dynamic _result = await Get.dialog(
+      AlertDialog(
+        content: const Text('Bạn có chắc muốn xóa toàn bộ dữ liệu.'),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Không'),
+            onPressed: () {
+              Get.back();
+            },
+          ),
+          TextButton(
+            child: const Text('Có'),
+            onPressed: () {
+              Get.back(
+                result: true,
+              );
+            },
+          ),
+        ],
+      ),
+    );
+
+    if (_result == true) {
+      await EasyLoading.show(
+        status: 'Đang xóa dữ liệu ...',
+        dismissOnTap: false,
+      );
+
+      appController.db
+          .prepare('DELETE FROM `results` WHERE `id` != 0')
+          .execute();
+
+      resultController.currLabel.value = null;
+      resultController.currKeyword.value = null;
+
+      await EasyLoading.showSuccess('Đã xóa dữ liệu thành công!');
     }
   }
 }

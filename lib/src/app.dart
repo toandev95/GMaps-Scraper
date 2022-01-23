@@ -31,6 +31,10 @@ class GoogleMapsScraperApp extends GetWidget<AppController> {
             BindingsBuilder.put(() => SettingController()),
           ],
         ),
+        GetPage(
+          name: RouteKeys.license,
+          page: () => const LicenseScreen(),
+        ),
       ],
       builder: EasyLoading.init(
         builder: (BuildContext context, Widget? child) {
