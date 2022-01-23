@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(google_maps_scraper_app LANGUAGES CXX)
 
-set(BINARY_NAME "Google Maps Scraper")
+set(BINARY_NAME "GoogleMapsScraper")
 
 cmake_policy(SET CMP0063 NEW)
 
