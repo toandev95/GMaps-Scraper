@@ -70,6 +70,17 @@ class AppController extends GetxController {
     }
 
     try {
+      // final String _val2 = Kcrypto.encrypt(
+      //   <String>[
+      //     packageInfo.appName,
+      //     deviceId,
+      //     DateTime.now().add(3.days).toSQL(),
+      //     'Toan Doan',
+      //     'toandev.95@gmail.com',
+      //   ].join('*'),
+      // );
+      // print(_val2);
+
       if (!prefs.containsKey(StorageKeys.licenseKey)) {
         final dynamic _result = await Get.dialog(
           AlertDialog(
@@ -99,9 +110,10 @@ class AppController extends GetxController {
         if (_result == true) {
           final String _val = Kcrypto.encrypt(
             <String>[
+              packageInfo.appName,
               deviceId,
-              DateTime.now().add(1.days).toSQL(),
-              // DateTime.now().toSQL(),
+              // DateTime.now().add(1.days).toSQL(),
+              DateTime.now().toSQL(),
               'Free Trial',
               'support@idex.vn',
             ].join('*'),
@@ -149,6 +161,8 @@ class AppController extends GetxController {
             emailTextCtrl.text = _license.email;
 
             return Get.offNamed(RouteKeys.license);
+          } else if (_license.productName != packageInfo.appName) {
+            throw LicenseKeyException();
           } else {
             licenseKey = _license;
           }
@@ -159,7 +173,7 @@ class AppController extends GetxController {
     } on LicenseKeyException {
       await prefs.remove(StorageKeys.licenseKey);
 
-      rethrow;
+      _errorCode = ErrorCodes.initLicense;
     } catch (e) {
       _errorCode = ErrorCodes.initLicense;
     }
@@ -204,11 +218,34 @@ class AppController extends GetxController {
       dismissOnTap: false,
     );
 
+    await Future.delayed(1.seconds);
+
     print(emailTextCtrl.text);
     print(licenseTextCtrl.text);
 
-    await Future.delayed(2.seconds);
+    try {
+      final String _val = licenseTextCtrl.text;
+      final LicenseKey _license = LicenseKey.fromKey(Kcrypto.decrypt(_val));
 
-    await EasyLoading.dismiss();
+      if (_license.email != emailTextCtrl.text) {
+        await EasyLoading.showInfo(
+          'Địa chỉ Email không khớp với khóa bản quyền!',
+        );
+      } else if (_license.expiresAt.difference(DateTime.now()).inSeconds < 0) {
+        await EasyLoading.showInfo('Khóa bản quyền đã hết hạn sử dụng!');
+      } else {
+        await prefs.setString(StorageKeys.licenseKey, _val);
+
+        await EasyLoading.showSuccess('Đã kích hoạt thành công!');
+
+        licenseKey = LicenseKey.fromKey(Kcrypto.decrypt(_val));
+
+        await Get.offNamed(RouteKeys.main);
+      }
+    } catch (e) {
+      await EasyLoading.showError('Khóa bản quyền không hợp lệ.');
+    }
+
+    // await EasyLoading.dismiss();
   }
 }

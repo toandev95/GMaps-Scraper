@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:google_maps_scraper_app/src/constants/constants.dart';
 import 'package:google_maps_scraper_app/src/controllers/controllers.dart';
@@ -46,15 +47,8 @@ class GoogleMapsScraperApp extends GetWidget<AppController> {
           return child!;
         },
       ),
-      localizationsDelegates: const <LocalizationsDelegate>[
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const <Locale>[
-        Locale('vi', 'VN'),
-        Locale('en', 'US'),
-      ],
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
     );
   }
 }
