@@ -19,6 +19,14 @@ class SettingScreen extends GetView<SettingController> {
           },
         ),
         title: Text('Thiết Lập'.toUpperCase()),
+        actions: <IconButton>[
+          IconButton(
+            icon: const Icon(Icons.vpn_key_rounded),
+            onPressed: () {
+              controller.handleLicense();
+            },
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(24.0),

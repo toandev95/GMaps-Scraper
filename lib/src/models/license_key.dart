@@ -1,4 +1,5 @@
 import 'package:google_maps_scraper_app/src/exceptions/exceptions.dart';
+import 'package:google_maps_scraper_app/src/utils/utils.dart';
 
 class LicenseKey {
   final String productName;
@@ -6,6 +7,7 @@ class LicenseKey {
   final DateTime expiresAt;
   final String name;
   final String email;
+  final String raw;
 
   LicenseKey({
     required this.productName,
@@ -13,10 +15,11 @@ class LicenseKey {
     required this.expiresAt,
     required this.name,
     required this.email,
+    required this.raw,
   });
 
   static LicenseKey fromKey(String val) {
-    final List<String> _ls = val.split('*');
+    final List<String> _ls = Kcrypto.decrypt(val).split('*');
 
     if (_ls.length != 5) {
       throw LicenseKeyException();
@@ -28,6 +31,7 @@ class LicenseKey {
       expiresAt: DateTime.parse(_ls[2]),
       name: _ls[3],
       email: _ls[4],
+      raw: val,
     );
   }
 }

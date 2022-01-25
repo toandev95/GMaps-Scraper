@@ -10,8 +10,8 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 import 'package:google_maps_scraper_app/src/constants/constants.dart';
 import 'package:google_maps_scraper_app/src/models/models.dart';
-import 'package:google_maps_scraper_app/src/utils/utils.dart';
 import 'package:google_maps_scraper_app/src/exceptions/exceptions.dart';
+import 'package:google_maps_scraper_app/src/utils/utils.dart';
 
 class AppController extends GetxController {
   late Database db;
@@ -62,7 +62,7 @@ class AppController extends GetxController {
         await prefs.setInt(StorageKeys.maxResult, 10000);
       }
 
-      if (prefs.containsKey(StorageKeys.timeout)) {
+      if (!prefs.containsKey(StorageKeys.timeout)) {
         await prefs.setInt(StorageKeys.timeout, 120);
       }
     } catch (e) {
@@ -70,70 +70,48 @@ class AppController extends GetxController {
     }
 
     try {
-      // final String _val2 = Kcrypto.encrypt(
-      //   <String>[
-      //     packageInfo.appName,
-      //     deviceId,
-      //     DateTime.now().add(3.days).toSQL(),
-      //     'Toan Doan',
-      //     'toandev.95@gmail.com',
-      //   ].join('*'),
-      // );
-      // print(_val2);
+      final String _val2 = Kcrypto.encrypt(
+        <String>[
+          packageInfo.appName,
+          deviceId,
+          DateTime.now().add(3.days).toSQL(),
+          'Toan Doan',
+          'toandev.95@gmail.com',
+        ].join('*'),
+      );
+      print(_val2);
 
       if (!prefs.containsKey(StorageKeys.licenseKey)) {
-        final dynamic _result = await Get.dialog(
+        await Get.dialog(
           AlertDialog(
             title: const Text('Chào Mừng'),
             content: const Text(
-              'Cảm ơn bạn đã cài đặt phần mềm, bạn sẽ được trải nghiệm miễn phí lần đầu trong vòng 24h. Chúc bạn một ngày làm việc hiệu quả.',
+              'Cảm ơn bạn đã quan tâm tới sản phẩm của chúng tôi, để sử dụng bạn vui lòng nhập khóa bản quyền.',
             ),
             actions: <Widget>[
               TextButton(
-                child: Text('Kích hoạt bản quyền'.toUpperCase()),
-                onPressed: () {
-                  Get.back();
-                },
-              ),
-              TextButton(
                 child: Text('OK'.toUpperCase()),
                 onPressed: () {
-                  Get.back(
-                    result: true,
-                  );
+                  Get.back();
                 },
               ),
             ],
           ),
         );
 
-        if (_result == true) {
-          final String _val = Kcrypto.encrypt(
-            <String>[
-              packageInfo.appName,
-              deviceId,
-              // DateTime.now().add(1.days).toSQL(),
-              DateTime.now().toSQL(),
-              'Free Trial',
-              'support@idex.vn',
-            ].join('*'),
-          );
-          // print(_val);
+        final dynamic _result = await Get.toNamed(RouteKeys.license);
 
-          // final String _val1 = Kcrypto.decrypt(_val);
-          // print(_val1);
-
-          await prefs.setString(StorageKeys.licenseKey, _val);
-
-          licenseKey = LicenseKey.fromKey(Kcrypto.decrypt(_val));
+        if (_result != true) {
+          throw NoLicenseKeyException();
         }
       } else {
         final String? _val = prefs.getString(StorageKeys.licenseKey);
 
         if (_val != null) {
-          final LicenseKey _license = LicenseKey.fromKey(
-            Kcrypto.decrypt(_val),
-          );
+          final LicenseKey _license = LicenseKey.fromKey(_val);
+
+          emailTextCtrl.text = _license.email;
+          licenseTextCtrl.text = _license.raw;
 
           if (_license.expiresAt.difference(DateTime.now()).inSeconds < 0) {
             await Get.dialog(
@@ -158,8 +136,6 @@ class AppController extends GetxController {
               ),
             );
 
-            emailTextCtrl.text = _license.email;
-
             return Get.offNamed(RouteKeys.license);
           } else if (_license.productName != packageInfo.appName) {
             throw LicenseKeyException();
@@ -173,6 +149,8 @@ class AppController extends GetxController {
     } on LicenseKeyException {
       await prefs.remove(StorageKeys.licenseKey);
 
+      _errorCode = ErrorCodes.initLicense;
+    } on NoLicenseKeyException {
       _errorCode = ErrorCodes.initLicense;
     } catch (e) {
       _errorCode = ErrorCodes.initLicense;
@@ -220,12 +198,12 @@ class AppController extends GetxController {
 
     await Future.delayed(1.seconds);
 
-    print(emailTextCtrl.text);
-    print(licenseTextCtrl.text);
+    // print(emailTextCtrl.text);
+    // print(licenseTextCtrl.text);
 
     try {
       final String _val = licenseTextCtrl.text;
-      final LicenseKey _license = LicenseKey.fromKey(Kcrypto.decrypt(_val));
+      final LicenseKey _license = LicenseKey.fromKey(_val);
 
       if (_license.email != emailTextCtrl.text) {
         await EasyLoading.showInfo(
@@ -238,9 +216,12 @@ class AppController extends GetxController {
 
         await EasyLoading.showSuccess('Đã kích hoạt thành công!');
 
-        licenseKey = LicenseKey.fromKey(Kcrypto.decrypt(_val));
+        licenseKey = LicenseKey.fromKey(_val);
 
-        await Get.offNamed(RouteKeys.main);
+        // await Get.offNamed(RouteKeys.main);
+        Get.back(
+          result: true,
+        );
       }
     } catch (e) {
       await EasyLoading.showError('Khóa bản quyền không hợp lệ.');

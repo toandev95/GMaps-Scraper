@@ -107,4 +107,8 @@ class SettingController extends GetxController {
       await EasyLoading.showSuccess('Đã xóa dữ liệu thành công!');
     }
   }
+
+  void handleLicense() async {
+    await Get.toNamed(RouteKeys.license);
+  }
 }
