@@ -9,6 +9,9 @@ class CustomTextField extends StatelessWidget {
   final int minLines;
   final int maxLines;
   final bool isRequired;
+  final String? initialValue;
+  final bool readOnly;
+  final Widget? suffixIcon;
 
   const CustomTextField({
     Key? key,
@@ -19,12 +22,16 @@ class CustomTextField extends StatelessWidget {
     this.minLines = 1,
     this.maxLines = 1,
     this.isRequired = false,
+    this.initialValue,
+    this.readOnly = false,
+    this.suffixIcon,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      initialValue: initialValue,
       keyboardType: keyboardType,
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.all(16.0),
@@ -60,9 +67,11 @@ class CustomTextField extends StatelessWidget {
         ),
         hintText: hintText,
         alignLabelWithHint: true,
+        suffixIcon: suffixIcon,
       ),
       minLines: minLines,
       maxLines: maxLines,
+      readOnly: readOnly,
     );
   }
 }

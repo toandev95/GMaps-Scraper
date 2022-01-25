@@ -25,6 +25,21 @@ class _LicenseScreenState extends State<LicenseScreen> {
         padding: const EdgeInsets.all(24.0),
         children: <Widget>[
           CustomTextField(
+            labelText: 'Mã thiết bị',
+            isRequired: true,
+            initialValue: appController.deviceId,
+            readOnly: true,
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.copy),
+              onPressed: () {
+                appController.handleCopyDeviceId();
+              },
+            ),
+          ),
+          const SizedBox(
+            height: 16.0,
+          ),
+          CustomTextField(
             controller: appController.emailTextCtrl,
             labelText: 'Email',
             isRequired: true,

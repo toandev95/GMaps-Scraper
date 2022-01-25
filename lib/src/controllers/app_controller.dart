@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:sqlite3/sqlite3.dart';
+import 'package:clipboard/clipboard.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -228,5 +229,11 @@ class AppController extends GetxController {
     }
 
     // await EasyLoading.dismiss();
+  }
+
+  void handleCopyDeviceId() async {
+    await FlutterClipboard.copy(deviceId);
+
+    await EasyLoading.showToast('Đã sao chép mã thiết bị.');
   }
 }
