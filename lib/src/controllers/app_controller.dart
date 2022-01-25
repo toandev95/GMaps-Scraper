@@ -74,8 +74,8 @@ class AppController extends GetxController {
       final String _val2 = Kcrypto.encrypt(
         <String>[
           packageInfo.appName,
-          deviceId,
-          DateTime.now().add(3.days).toSQL(),
+          '92C0E9B6-E02C-9B48-149C-82F76C5F8EC0',
+          DateTime.now().add(30.days).toSQL(),
           'Toan Doan',
           'toandev.95@gmail.com',
         ].join('*'),
@@ -206,7 +206,11 @@ class AppController extends GetxController {
       final String _val = licenseTextCtrl.text;
       final LicenseKey _license = LicenseKey.fromKey(_val);
 
-      if (_license.email != emailTextCtrl.text) {
+      if (_license.deviceId != deviceId) {
+        await EasyLoading.showInfo(
+          'Khóa bản quyền này không được cấp phép sử dụng trên thiết bị này!.',
+        );
+      } else if (_license.email != emailTextCtrl.text) {
         await EasyLoading.showInfo(
           'Địa chỉ Email không khớp với khóa bản quyền!',
         );
