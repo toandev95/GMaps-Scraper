@@ -44,7 +44,7 @@ class AppController extends GetxController {
         throw Exception('Device ID is Null!');
       }
 
-      deviceId = _deviceId;
+      deviceId = _deviceId.trim();
     } catch (e) {
       _errorCode = ErrorCodes.initDeviceID;
     }
@@ -208,7 +208,7 @@ class AppController extends GetxController {
 
       if (_license.deviceId != deviceId) {
         await EasyLoading.showInfo(
-          'Khóa bản quyền này không được cấp phép sử dụng trên thiết bị này!.',
+          'Khóa bản quyền không được cấp phép sử dụng trên thiết bị này!.',
         );
       } else if (_license.email != emailTextCtrl.text) {
         await EasyLoading.showInfo(
