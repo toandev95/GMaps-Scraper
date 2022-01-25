@@ -137,7 +137,11 @@ class AppController extends GetxController {
               ),
             );
 
-            return Get.offNamed(RouteKeys.license);
+            final dynamic _result = await Get.toNamed(RouteKeys.license);
+
+            if (_result != true) {
+              throw NoLicenseKeyException();
+            }
           } else if (_license.productName != packageInfo.appName) {
             throw LicenseKeyException();
           } else {
