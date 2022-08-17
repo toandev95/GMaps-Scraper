@@ -99,7 +99,7 @@ class ToolController extends GetxController {
         ],
       );
 
-      await _run(page);
+      _run(page);
     }
   }
 

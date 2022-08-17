@@ -173,7 +173,7 @@ class AppController extends GetxController {
     if (errorCode == null) {
       await Future.delayed(2.seconds);
 
-      await Get.offNamed(RouteKeys.main);
+      Get.offNamed(RouteKeys.main);
     } else {
       Get.dialog(
         AlertDialog(
