@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import 'package:google_maps_scraper_app/src/constants/constants.dart';
 import 'package:google_maps_scraper_app/src/controllers/controllers.dart';
@@ -43,7 +43,7 @@ class _MainScreenState extends State<MainScreen> {
       );
 
   void openSupport() async {
-    await launch(supportUrl);
+    await launchUrlString(supportUrl);
   }
 
   @override

@@ -3,8 +3,8 @@ import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:crypto/crypto.dart';
-import 'package:google_maps_scraper_app/src/utils/extensions.dart';
 import 'package:puppeteer/puppeteer.dart';
+import 'package:sqlite3/sqlite3.dart';
 import 'package:flutter/material.dart' hide Page, Key;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -13,7 +13,7 @@ import 'package:google_maps_scraper_app/src/constants/constants.dart';
 import 'package:google_maps_scraper_app/src/controllers/controllers.dart';
 import 'package:google_maps_scraper_app/src/screens/screens.dart';
 import 'package:google_maps_scraper_app/src/models/models.dart';
-import 'package:sqlite3/sqlite3.dart';
+import 'package:google_maps_scraper_app/src/utils/extensions.dart';
 
 class ToolController extends GetxController {
   final AppController appController = Get.find<AppController>();

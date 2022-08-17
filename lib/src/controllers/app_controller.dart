@@ -74,7 +74,7 @@ class AppController extends GetxController {
       final String _val2 = Kcrypto.encrypt(
         <String>[
           packageInfo.appName,
-          '92C0E9B6-E02C-9B48-149C-82F76C5F8EC0',
+          'C1C34037-F172-D74B-B908-6CF3F839D67E',
           DateTime.now().add(30.days).toSQL(),
           'Toan Doan',
           'toandev.95@gmail.com',
