@@ -1,2 +1,2 @@
-const String supportUrl = 'https://zalo.me/g/larwns187';
+const String supportUrl = 'https://t.me/wiz7693';
 const String dbName = 'gmaps_idex.db';

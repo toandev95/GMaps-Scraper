@@ -133,7 +133,7 @@ class ToolController extends GetxController {
     await page.keyboard.press(Key.enter);
 
     await page.waitForSelector(
-      '.section-scrollbox[role="region"]',
+      'div[aria-label*="Results"]',
       visible: true,
     );
     await Future.delayed(2.seconds);
@@ -164,7 +164,8 @@ class ToolController extends GetxController {
     );
 
     final List<ElementHandle> _elms = await page.$$(
-      '.section-scrollbox div[jsaction*="mouseover:pane"]',
+      // '.section-scrollbox div[jsaction*="mouseover:pane"]',
+      'div[aria-label*="Results"] div[jsaction*="mouseover:pane"]',
     );
     final ElementHandle _elm = _elms[currListItemIndex];
 
