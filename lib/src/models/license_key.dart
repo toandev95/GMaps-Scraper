@@ -1,5 +1,5 @@
-import 'package:google_maps_scraper_app/src/exceptions/exceptions.dart';
-import 'package:google_maps_scraper_app/src/utils/utils.dart';
+import 'package:gmaps_scraper_app/src/exceptions/exceptions.dart';
+import 'package:gmaps_scraper_app/src/utils/utils.dart';
 
 class LicenseKey {
   final String productName;
@@ -19,18 +19,18 @@ class LicenseKey {
   });
 
   static LicenseKey fromKey(String val) {
-    final List<String> _ls = Kcrypto.decrypt(val).split('*');
+    final List<String> ls = Kcrypto.decrypt(val).split('*');
 
-    if (_ls.length != 5) {
+    if (ls.length != 5) {
       throw LicenseKeyException();
     }
 
     return LicenseKey(
-      productName: _ls[0],
-      deviceId: _ls[1],
-      expiresAt: DateTime.parse(_ls[2]),
-      name: _ls[3],
-      email: _ls[4],
+      productName: ls[0],
+      deviceId: ls[1],
+      expiresAt: DateTime.parse(ls[2]),
+      name: ls[3],
+      email: ls[4],
       raw: val,
     );
   }

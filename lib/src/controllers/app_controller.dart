@@ -9,10 +9,10 @@ import 'package:platform_device_id/platform_device_id.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
-import 'package:google_maps_scraper_app/src/constants/constants.dart';
-import 'package:google_maps_scraper_app/src/models/models.dart';
-import 'package:google_maps_scraper_app/src/exceptions/exceptions.dart';
-import 'package:google_maps_scraper_app/src/utils/utils.dart';
+import 'package:gmaps_scraper_app/src/constants/constants.dart';
+import 'package:gmaps_scraper_app/src/models/models.dart';
+import 'package:gmaps_scraper_app/src/exceptions/exceptions.dart';
+import 'package:gmaps_scraper_app/src/utils/utils.dart';
 
 class AppController extends GetxController {
   late Database db;
@@ -30,7 +30,7 @@ class AppController extends GetxController {
   void onReady() async {
     super.onReady();
 
-    int? _errorCode;
+    int? errorCode;
 
     db = sqlite3.open(
       dbName,
@@ -38,22 +38,22 @@ class AppController extends GetxController {
     );
 
     try {
-      final String? _deviceId = await PlatformDeviceId.getDeviceId;
+      final String? platformDeviceId = await PlatformDeviceId.getDeviceId;
 
-      if (_deviceId == null) {
+      if (platformDeviceId == null) {
         throw Exception('Device ID is Null!');
       }
 
-      deviceId = _deviceId.trim();
+      deviceId = platformDeviceId.trim();
     } catch (e) {
-      _errorCode = ErrorCodes.initDeviceID;
+      errorCode = ErrorCodes.initDeviceID;
     }
 
     try {
       prefs = await SharedPreferences.getInstance();
       packageInfo = await PackageInfo.fromPlatform();
     } catch (e) {
-      _errorCode = ErrorCodes.initPackages;
+      errorCode = ErrorCodes.initPackages;
     }
 
     try {
@@ -67,11 +67,11 @@ class AppController extends GetxController {
         await prefs.setInt(StorageKeys.timeout, 120);
       }
     } catch (e) {
-      _errorCode = ErrorCodes.initApp;
+      errorCode = ErrorCodes.initApp;
     }
 
     try {
-      final String _val2 = Kcrypto.encrypt(
+      final String val2 = Kcrypto.encrypt(
         <String>[
           packageInfo.appName,
           'C1C34037-F172-D74B-B908-6CF3F839D67E',
@@ -80,7 +80,16 @@ class AppController extends GetxController {
           'toandev.95@gmail.com',
         ].join('*'),
       );
-      print(_val2);
+      print(val2);
+      print(
+        <String>[
+          packageInfo.appName,
+          'C1C34037-F172-D74B-B908-6CF3F839D67E',
+          DateTime.now().add(30.days).toSQL(),
+          'Toan Doan',
+          'toandev.95@gmail.com',
+        ].join('*'),
+      );
 
       if (!prefs.containsKey(StorageKeys.licenseKey)) {
         await Get.dialog(
@@ -100,21 +109,21 @@ class AppController extends GetxController {
           ),
         );
 
-        final dynamic _result = await Get.toNamed(RouteKeys.license);
+        final dynamic result = await Get.toNamed(RouteKeys.license);
 
-        if (_result != true) {
+        if (result != true) {
           throw NoLicenseKeyException();
         }
       } else {
-        final String? _val = prefs.getString(StorageKeys.licenseKey);
+        final String? val = prefs.getString(StorageKeys.licenseKey);
 
-        if (_val != null) {
-          final LicenseKey _license = LicenseKey.fromKey(_val);
+        if (val != null) {
+          final LicenseKey license = LicenseKey.fromKey(val);
 
-          emailTextCtrl.text = _license.email;
-          licenseTextCtrl.text = _license.raw;
+          emailTextCtrl.text = license.email;
+          licenseTextCtrl.text = license.raw;
 
-          if (_license.expiresAt.difference(DateTime.now()).inSeconds < 0) {
+          if (license.expiresAt.difference(DateTime.now()).inSeconds < 0) {
             await Get.dialog(
               AlertDialog(
                 content: const Text(
@@ -137,15 +146,15 @@ class AppController extends GetxController {
               ),
             );
 
-            final dynamic _result = await Get.toNamed(RouteKeys.license);
+            final dynamic result = await Get.toNamed(RouteKeys.license);
 
-            if (_result != true) {
+            if (result != true) {
               throw NoLicenseKeyException();
             }
-          } else if (_license.productName != packageInfo.appName) {
+          } else if (license.productName != packageInfo.appName) {
             throw LicenseKeyException();
           } else {
-            licenseKey = _license;
+            licenseKey = license;
           }
         } else {
           throw LicenseKeyException();
@@ -154,14 +163,14 @@ class AppController extends GetxController {
     } on LicenseKeyException {
       await prefs.remove(StorageKeys.licenseKey);
 
-      _errorCode = ErrorCodes.initLicense;
+      errorCode = ErrorCodes.initLicense;
     } on NoLicenseKeyException {
-      _errorCode = ErrorCodes.initLicense;
+      errorCode = ErrorCodes.initLicense;
     } catch (e) {
-      _errorCode = ErrorCodes.initLicense;
+      errorCode = ErrorCodes.initLicense;
     }
 
-    if (_errorCode == null) {
+    if (errorCode == null) {
       await Future.delayed(2.seconds);
 
       await Get.offNamed(RouteKeys.main);
@@ -170,7 +179,7 @@ class AppController extends GetxController {
         AlertDialog(
           title: Text('Sự Cố'.toUpperCase()),
           content: Text(
-            'Phần mềm xãy ra sự cố, vui lòng thử tắt mở lại phần mềm.\nMã lỗi #$_errorCode',
+            'Phần mềm xãy ra sự cố, vui lòng thử tắt mở lại phần mềm.\nMã lỗi #$errorCode',
           ),
           actions: <Widget>[
             TextButton(
@@ -207,25 +216,25 @@ class AppController extends GetxController {
     // print(licenseTextCtrl.text);
 
     try {
-      final String _val = licenseTextCtrl.text;
-      final LicenseKey _license = LicenseKey.fromKey(_val);
+      final String val = licenseTextCtrl.text;
+      final LicenseKey license = LicenseKey.fromKey(val);
 
-      if (_license.deviceId != deviceId) {
+      if (license.deviceId != deviceId) {
         await EasyLoading.showInfo(
           'Khóa bản quyền không được cấp phép sử dụng trên thiết bị này!.',
         );
-      } else if (_license.email != emailTextCtrl.text) {
+      } else if (license.email != emailTextCtrl.text) {
         await EasyLoading.showInfo(
           'Địa chỉ Email không khớp với khóa bản quyền!',
         );
-      } else if (_license.expiresAt.difference(DateTime.now()).inSeconds < 0) {
+      } else if (license.expiresAt.difference(DateTime.now()).inSeconds < 0) {
         await EasyLoading.showInfo('Khóa bản quyền đã hết hạn sử dụng!');
       } else {
-        await prefs.setString(StorageKeys.licenseKey, _val);
+        await prefs.setString(StorageKeys.licenseKey, val);
 
         await EasyLoading.showSuccess('Đã kích hoạt thành công!');
 
-        licenseKey = LicenseKey.fromKey(_val);
+        licenseKey = LicenseKey.fromKey(val);
 
         // await Get.offNamed(RouteKeys.main);
         Get.back(
@@ -233,6 +242,8 @@ class AppController extends GetxController {
         );
       }
     } catch (e) {
+      print(e);
+
       await EasyLoading.showError('Khóa bản quyền không hợp lệ.');
     }
 

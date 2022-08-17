@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
-import 'package:google_maps_scraper_app/src/components/components.dart';
-import 'package:google_maps_scraper_app/src/controllers/controllers.dart';
+import 'package:gmaps_scraper_app/src/components/components.dart';
+import 'package:gmaps_scraper_app/src/controllers/controllers.dart';
 
 class SettingScreen extends GetView<SettingController> {
   const SettingScreen({Key? key}) : super(key: key);

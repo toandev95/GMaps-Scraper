@@ -9,11 +9,11 @@ import 'package:flutter/material.dart' hide Page, Key;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
-import 'package:google_maps_scraper_app/src/constants/constants.dart';
-import 'package:google_maps_scraper_app/src/controllers/controllers.dart';
-import 'package:google_maps_scraper_app/src/screens/screens.dart';
-import 'package:google_maps_scraper_app/src/models/models.dart';
-import 'package:google_maps_scraper_app/src/utils/extensions.dart';
+import 'package:gmaps_scraper_app/src/constants/constants.dart';
+import 'package:gmaps_scraper_app/src/controllers/controllers.dart';
+import 'package:gmaps_scraper_app/src/screens/screens.dart';
+import 'package:gmaps_scraper_app/src/models/models.dart';
+import 'package:gmaps_scraper_app/src/utils/extensions.dart';
 
 class ToolController extends GetxController {
   final AppController appController = Get.find<AppController>();
@@ -40,13 +40,13 @@ class ToolController extends GetxController {
   }
 
   void handleRun() async {
-    final List<String> _keywords = keywordTextCtrl.text
+    final List<String> list = keywordTextCtrl.text
         .split('\n')
         .map((String s) => s.trim())
         .where((String s) => s.isNotEmpty && s.length > 1)
         .toList();
 
-    keywords.addAll(_keywords);
+    keywords.addAll(list);
 
     if (cfgChromePath == null) {
       await EasyLoading.showToast(
@@ -67,7 +67,7 @@ class ToolController extends GetxController {
         fullscreenDialog: true,
       );
 
-      final Browser _browser = await puppeteer.launch(
+      final Browser browser = await puppeteer.launch(
         headless: false,
         executablePath: cfgChromePath,
         defaultViewport: const DeviceViewport(
@@ -85,13 +85,13 @@ class ToolController extends GetxController {
 
       await EasyLoading.dismiss();
 
-      final Page _page = await _browser.newPage();
-      currPage = _page;
+      final Page page = await browser.newPage();
+      currPage = page;
 
       // _page.defaultTimeout = 2.minutes;
-      _page.defaultTimeout = cfgTimeout.seconds;
+      page.defaultTimeout = cfgTimeout.seconds;
 
-      await _page.browserContext.overridePermissions(
+      await page.browserContext.overridePermissions(
         'https://www.google.com/maps',
         <PermissionType>[
           PermissionType.clipboardReadWrite,
@@ -99,7 +99,7 @@ class ToolController extends GetxController {
         ],
       );
 
-      await _run(_page);
+      await _run(page);
     }
   }
 
@@ -138,8 +138,8 @@ class ToolController extends GetxController {
     );
     await Future.delayed(2.seconds);
 
-    final ElementHandle _sceneElm = await page.$('.id-scene');
-    await _sceneElm.evaluate('node => node.remove()');
+    final ElementHandle sceneElm = await page.$('.id-scene');
+    await sceneElm.evaluate('node => node.remove()');
 
     log('Chuẩn bị thu thập các thông tin địa điểm.');
 
@@ -157,181 +157,181 @@ class ToolController extends GetxController {
   Future<void> _loop(Page page) async {
     log('Lấy dữ liệu vị trí #$currListItemIndex.');
 
-    final Result _result = Result(
+    final Result result = Result(
       label: labelTextCtrl.text.isNotEmpty ? labelTextCtrl.text : null,
       keyword: keywords[currKeywordIndex],
       createdAt: DateTime.now(),
     );
 
-    final List<ElementHandle> _elms = await page.$$(
+    final List<ElementHandle> elms = await page.$$(
       // '.section-scrollbox div[jsaction*="mouseover:pane"]',
       'div[aria-label*="Results"] div[jsaction*="mouseover:pane"]',
     );
-    final ElementHandle _elm = _elms[currListItemIndex];
+    final ElementHandle elm = elms[currListItemIndex];
 
-    await _elm.click();
+    await elm.click();
 
     await Future.delayed(2.seconds);
 
-    final ElementHandle? _titleElm = await page.$OrNull(
+    final ElementHandle? titleElm = await page.$OrNull(
       'h1[class*="header-title-title"] span:nth-child(1)',
     );
 
-    if (_titleElm != null) {
-      final String? _title = await _titleElm.evaluate(
+    if (titleElm != null) {
+      final String? title = await titleElm.evaluate(
         'n => n.innerText || null',
       );
 
-      if (_title != null && _title.isNotEmpty) {
+      if (title != null && title.isNotEmpty) {
         // print(_title);
 
-        _result.title = _title;
+        result.title = title;
       }
     }
 
-    final ElementHandle? _subTitleElm = await page.$OrNull(
+    final ElementHandle? subTitleElm = await page.$OrNull(
       'h1[class*="header-title-title"] span:nth-child(2)',
     );
 
-    if (_subTitleElm != null) {
-      final String? _subTitle = await _subTitleElm.evaluate(
+    if (subTitleElm != null) {
+      final String? subTitle = await subTitleElm.evaluate(
         'n => n.innerText || null',
       );
 
-      if (_subTitle != null && _subTitle.isNotEmpty) {
+      if (subTitle != null && subTitle.isNotEmpty) {
         // print(_subTitle);
 
-        _result.subTitle = _subTitle;
+        result.subTitle = subTitle;
       }
     }
 
-    final ElementHandle? _starArrayElm = await page.$OrNull(
+    final ElementHandle? starArrayElm = await page.$OrNull(
       '.section-star-array',
     );
 
-    if (_starArrayElm != null) {
-      final String? _starText = await _starArrayElm.evaluate(
+    if (starArrayElm != null) {
+      final String? starText = await starArrayElm.evaluate(
         'n => n.parentNode.querySelector("span[aria-hidden=true]").innerText',
       );
 
-      if (_starText != null && _starText.isNotEmpty) {
+      if (starText != null && starText.isNotEmpty) {
         // print(_starText);
 
-        _result.star = double.tryParse(_starText);
+        result.star = double.tryParse(starText);
       }
     }
 
-    final ElementHandle? _totalReviewElm = await page.$OrNull(
+    final ElementHandle? totalReviewElm = await page.$OrNull(
       'button[jsaction="pane.rating.moreReviews"]',
     );
 
-    if (_totalReviewElm != null) {
-      final String? _totalReviewText = await _totalReviewElm.evaluate(
+    if (totalReviewElm != null) {
+      final String? totalReviewText = await totalReviewElm.evaluate(
         'n => n.innerText || null',
       );
 
-      if (_totalReviewText != null && _totalReviewText.isNotEmpty) {
+      if (totalReviewText != null && totalReviewText.isNotEmpty) {
         // print(_totalReviewText);
 
-        _result.totalReview = int.tryParse(_totalReviewText.split(' ').first);
+        result.totalReview = int.tryParse(totalReviewText.split(' ').first);
       }
     }
 
-    final ElementHandle? _categoryElm = await page.$OrNull(
+    final ElementHandle? categoryElm = await page.$OrNull(
       'button[jsaction="pane.rating.category"]',
     );
 
-    if (_categoryElm != null) {
-      final String? _categoryName = await _categoryElm.evaluate(
+    if (categoryElm != null) {
+      final String? categoryName = await categoryElm.evaluate(
         'n => n.innerText || null',
       );
 
-      if (_categoryName != null && _categoryName.isNotEmpty) {
+      if (categoryName != null && categoryName.isNotEmpty) {
         // print(_categoryName);
 
-        _result.categoryName = _categoryName;
+        result.categoryName = categoryName;
       }
     }
 
-    final ElementHandle? _attrElm = await page.$OrNull(
+    final ElementHandle? attrElm = await page.$OrNull(
       'button[jsaction*="pane.attributes."]',
     );
 
-    if (_attrElm != null) {
-      final List<ElementHandle> _attrElms = await _attrElm.$$(
+    if (attrElm != null) {
+      final List<ElementHandle> attrElms = await attrElm.$$(
         'div[jsan*="text,"][class*="-text"]',
       );
 
-      if (_attrElms.isNotEmpty) {
-        final List<String> _attrs = <String>[];
+      if (attrElms.isNotEmpty) {
+        final List<String> attrs = <String>[];
 
-        for (ElementHandle attrElm in _attrElms) {
-          final String? _attrText = await attrElm.evaluate(
+        for (ElementHandle attrElm in attrElms) {
+          final String? attrText = await attrElm.evaluate(
             'n => n.innerText || null',
           );
 
-          if (_attrText != null) {
-            _attrs.add(_attrText);
+          if (attrText != null) {
+            attrs.add(attrText);
           }
         }
 
-        if (_attrs.isNotEmpty) {
-          // print(_attrs);
+        if (attrs.isNotEmpty) {
+          // print(attrs);
 
-          _result.attributes = _attrs.map((String s) => s).toList();
+          result.attributes = attrs.map((String s) => s).toList();
         }
       }
     }
 
-    final ElementHandle? _addressElm = await page.$OrNull(
+    final ElementHandle? addressElm = await page.$OrNull(
       'button[data-item-id="address"] div[jsan*="gm2-body-2"][class*="text"]',
     );
 
-    if (_addressElm != null) {
-      final String? _addressText = await _addressElm.evaluate(
+    if (addressElm != null) {
+      final String? addressText = await addressElm.evaluate(
         'n => n.innerText || null',
       );
 
-      if (_addressText != null && _addressText.isNotEmpty) {
-        // print(_addressText);
+      if (addressText != null && addressText.isNotEmpty) {
+        // print(addressText);
 
-        _result.address = _addressText;
+        result.address = addressText;
       }
     }
 
-    final ElementHandle? _openHoursElm = await page.$OrNull(
+    final ElementHandle? openHoursElm = await page.$OrNull(
       'div[jsaction*="pane.openhours."] span[class*="hour-text"]',
     );
 
-    if (_openHoursElm != null) {
-      final String? _openHoursText = await _openHoursElm.evaluate(
+    if (openHoursElm != null) {
+      final String? openHoursText = await openHoursElm.evaluate(
         'n => n.innerText || null',
       );
 
-      if (_openHoursText != null && _openHoursText.isNotEmpty) {
-        // print(_openHoursText);
+      if (openHoursText != null && openHoursText.isNotEmpty) {
+        // print(openHoursText);
 
-        _result.openHours = _openHoursText;
+        result.openHours = openHoursText;
       }
     }
 
-    final ElementHandle? _authorityElm = await page.$OrNull(
+    final ElementHandle? authorityElm = await page.$OrNull(
       'button[data-item-id="authority"]',
     );
 
-    if (_authorityElm != null) {
-      await _authorityElm.hover();
+    if (authorityElm != null) {
+      await authorityElm.hover();
 
-      final ElementHandle? _copyBtnElm = await page.$OrNull(
+      final ElementHandle? copyBtnElm = await page.$OrNull(
         'button[jsaction*="pane.focusTooltip"][jsaction*="keydown:pane"][aria-label*="web"] img[src*="copy"]',
       );
 
-      if (_copyBtnElm != null) {
-        await _copyBtnElm.click();
+      if (copyBtnElm != null) {
+        await copyBtnElm.click();
 
         await Future.delayed(1.seconds);
 
-        final String? _clipboard = await page.evaluate(
+        final String? clipboard = await page.evaluate(
           '''async () => {
             try {
               return await navigator.clipboard.readText();
@@ -341,61 +341,61 @@ class ToolController extends GetxController {
           }''',
         );
 
-        if (_clipboard != null && _clipboard.isNotEmpty) {
-          // print(_clipboard);
+        if (clipboard != null && clipboard.isNotEmpty) {
+          // print(clipboard);
 
-          _result.websiteUrl = _clipboard;
+          result.websiteUrl = clipboard;
         }
       }
     }
 
-    final ElementHandle? _phoneElm = await page.$OrNull(
+    final ElementHandle? phoneElm = await page.$OrNull(
       'button[data-item-id*="phone:tel"]',
     );
 
-    if (_phoneElm != null) {
-      final String? _phoneText = await _phoneElm.evaluate(
+    if (phoneElm != null) {
+      final String? phoneText = await phoneElm.evaluate(
         'n => n.getAttribute("data-item-id")',
       );
 
-      if (_phoneText != null &&
-          _phoneText.isNotEmpty &&
-          _phoneText.contains('tel:')) {
-        // print(_phoneText.split('tel:')[1].trim());
+      if (phoneText != null &&
+          phoneText.isNotEmpty &&
+          phoneText.contains('tel:')) {
+        // print(phoneText.split('tel:')[1].trim());
 
-        _result.phoneNumber = _phoneText.split('tel:')[1].trim();
+        result.phoneNumber = phoneText.split('tel:')[1].trim();
       }
     }
 
-    final ElementHandle? _heroImageElm = await page.$OrNull(
+    final ElementHandle? heroImageElm = await page.$OrNull(
       'button[jsaction="pane.heroHeaderImage.click"] > img',
     );
 
-    if (_heroImageElm != null) {
-      final String? _imageUrl = await _heroImageElm.evaluate(
+    if (heroImageElm != null) {
+      final String? imageUrl = await heroImageElm.evaluate(
         'n => n.getAttribute("src")',
       );
 
-      if (_imageUrl != null && _imageUrl.isNotEmpty) {
-        // print(_imageUrl);
+      if (imageUrl != null && imageUrl.isNotEmpty) {
+        // print(imageUrl);
 
-        _result.imageUrl = _imageUrl;
+        result.imageUrl = imageUrl;
       }
     }
 
-    if (_result.title != null && _result.address != null) {
-      _result.key = md5
-          .convert(utf8.encode('${_result.title!}+${_result.address}'))
+    if (result.title != null && result.address != null) {
+      result.key = md5
+          .convert(utf8.encode('${result.title!}+${result.address}'))
           .toString();
 
-      final ResultSet _res = appController.db.select(
+      final ResultSet res = appController.db.select(
         '''SELECT `id`
         FROM `results`
-        WHERE `key` = "${_result.key}"
+        WHERE `key` = "${result.key}"
         LIMIT 1''',
       );
 
-      if (_res.rows.isEmpty) {
+      if (res.rows.isEmpty) {
         appController.db.prepare(
           '''INSERT INTO `results`
           (
@@ -417,20 +417,20 @@ class ToolController extends GetxController {
           )
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
         ).execute([
-          _result.key,
-          _result.label,
-          _result.keyword,
-          _result.title,
-          _result.subTitle,
-          _result.star,
-          _result.totalReview,
-          _result.categoryName,
-          (_result.attributes ?? []).join(','),
-          _result.address,
-          _result.openHours,
-          _result.websiteUrl,
-          _result.phoneNumber,
-          _result.imageUrl,
+          result.key,
+          result.label,
+          result.keyword,
+          result.title,
+          result.subTitle,
+          result.star,
+          result.totalReview,
+          result.categoryName,
+          (result.attributes ?? []).join(','),
+          result.address,
+          result.openHours,
+          result.websiteUrl,
+          result.phoneNumber,
+          result.imageUrl,
           DateTime.now().toSQL(),
         ]);
       } else {
@@ -451,21 +451,21 @@ class ToolController extends GetxController {
             `phone_number` = ?,
             `image_url` = ?,
             `updated_at` = ?
-          WHERE `key` = "${_result.key}"''',
+          WHERE `key` = "${result.key}"''',
         ).execute([
-          _result.label,
-          _result.keyword,
-          _result.title,
-          _result.subTitle,
-          _result.star,
-          _result.totalReview,
-          _result.categoryName,
-          (_result.attributes ?? <String>[]).join(','),
-          _result.address,
-          _result.openHours,
-          _result.websiteUrl,
-          _result.phoneNumber,
-          _result.imageUrl,
+          result.label,
+          result.keyword,
+          result.title,
+          result.subTitle,
+          result.star,
+          result.totalReview,
+          result.categoryName,
+          (result.attributes ?? <String>[]).join(','),
+          result.address,
+          result.openHours,
+          result.websiteUrl,
+          result.phoneNumber,
+          result.imageUrl,
           DateTime.now().toSQL(),
         ]);
       }
@@ -490,25 +490,25 @@ class ToolController extends GetxController {
       return Future.value();
     }
 
-    if (currListItemIndex < _elms.length - 1) {
+    if (currListItemIndex < elms.length - 1) {
       currListItemIndex++;
 
       return _loop(page);
     } else {
-      final ElementHandle? _nextElm = await page.$OrNull(
+      final ElementHandle? nextElm = await page.$OrNull(
         'button[jsaction="pane.paginationSection.nextPage"]',
       );
 
-      final bool _hasNextPage = _nextElm != null
-          ? await _nextElm.evaluate('n => !n.hasAttribute("disabled")')
+      final bool hasNextPage = nextElm != null
+          ? await nextElm.evaluate('n => !n.hasAttribute("disabled")')
           : false;
 
-      if (_hasNextPage) {
+      if (hasNextPage) {
         logs.clear();
 
         log('Đang chuyển trang để thu thập danh sách tiếp theo.');
 
-        await _nextElm.click();
+        await nextElm.click();
 
         currListItemIndex = 0;
 

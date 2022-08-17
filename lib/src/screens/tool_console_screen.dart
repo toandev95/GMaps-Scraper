@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
-import 'package:google_maps_scraper_app/src/controllers/controllers.dart';
-import 'package:google_maps_scraper_app/src/utils/extensions.dart';
+import 'package:gmaps_scraper_app/src/controllers/controllers.dart';
+import 'package:gmaps_scraper_app/src/utils/extensions.dart';
 
 class ToolConsoleScreen extends GetView<ToolController> {
   const ToolConsoleScreen({Key? key}) : super(key: key);

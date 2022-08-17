@@ -6,8 +6,8 @@ import 'package:sqlite3/sqlite3.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
-import 'package:google_maps_scraper_app/src/controllers/controllers.dart';
-import 'package:google_maps_scraper_app/src/models/models.dart';
+import 'package:gmaps_scraper_app/src/controllers/controllers.dart';
+import 'package:gmaps_scraper_app/src/models/models.dart';
 
 class ResultController extends GetxController {
   final AppController appController = Get.find<AppController>();
@@ -18,22 +18,22 @@ class ResultController extends GetxController {
   final RxList<Result> results = RxList<Result>.empty();
 
   List<String?> get labels {
-    final ResultSet _res = appController.db.select(
+    final ResultSet res = appController.db.select(
       'SELECT `label` FROM `results` GROUP BY `label`',
     );
 
-    return _res
+    return res
         // ignore: prefer_null_aware_operators
         .map((Row r) => r['label'] != null ? r['label'].toString() : null)
         .toList();
   }
 
   List<String> get keywords {
-    final ResultSet _res = appController.db.select(
+    final ResultSet res = appController.db.select(
       'SELECT `keyword` FROM `results` GROUP BY `keyword`',
     );
 
-    return _res.map((Row r) => r['keyword'].toString()).toList();
+    return res.map((Row r) => r['keyword'].toString()).toList();
   }
 
   @override
@@ -43,13 +43,13 @@ class ResultController extends GetxController {
     everAll(
       <RxInterface>[currLabel, currKeyword],
       (e) {
-        final List<Result> _results = loadData(
+        final List<Result> data = loadData(
           label: currLabel.value,
           keyword: currKeyword.value,
           limit: 500,
         );
 
-        results.assignAll(_results);
+        results.assignAll(data);
       },
     );
 
@@ -62,29 +62,29 @@ class ResultController extends GetxController {
     String? keyword,
     int? limit,
   }) {
-    String _sql = 'SELECT * FROM `results` WHERE `id` NOT NULL ';
+    String sql = 'SELECT * FROM `results` WHERE `id` NOT NULL ';
 
     if (label != null) {
-      _sql += 'AND `label` = "$label" ';
+      sql += 'AND `label` = "$label" ';
     } else {
-      _sql += 'AND `label` IS NULL ';
+      sql += 'AND `label` IS NULL ';
     }
 
     if (keyword != null) {
-      _sql += 'AND `keyword` = "$keyword" ';
+      sql += 'AND `keyword` = "$keyword" ';
     }
 
-    _sql += 'ORDER BY created_at DESC ';
+    sql += 'ORDER BY created_at DESC ';
 
     if (limit != null) {
-      _sql += 'LIMIT $limit';
+      sql += 'LIMIT $limit';
     }
 
     // print(_sql);
 
-    final ResultSet _res = appController.db.select(_sql);
+    final ResultSet res = appController.db.select(sql);
 
-    return _res.map((Row r) => Result.fromRow(r)).toList();
+    return res.map((Row r) => Result.fromRow(r)).toList();
   }
 
   void handleExport() async {
@@ -99,32 +99,32 @@ class ResultController extends GetxController {
       dismissOnTap: false,
     );
 
-    String? _saveFilePath;
+    String? saveFilePath;
 
     try {
-      _saveFilePath = await FilePicker.platform.saveFile(
+      saveFilePath = await FilePicker.platform.saveFile(
         dialogTitle: 'Chọn file lưu',
         fileName: 'GMAPS_IDEX.VN.xlsx',
         lockParentWindow: true,
       );
     } catch (e) {
-      _saveFilePath = null;
+      saveFilePath = null;
     }
 
-    if (_saveFilePath != null) {
+    if (saveFilePath != null) {
       await EasyLoading.show(
         status: 'Đang tổng hợp dữ liệu ...',
         dismissOnTap: false,
       );
 
-      final Excel _excel = Excel.createExcel();
+      final Excel excel = Excel.createExcel();
 
-      const String _defaultSheetName = 'Sheet1';
+      const String defaultSheetName = 'Sheet1';
 
-      final String _sheetName = currKeyword.value ?? _defaultSheetName;
-      final Sheet _sheet1 = _excel[_sheetName];
+      final String sheetName = currKeyword.value ?? defaultSheetName;
+      final Sheet sheet1 = excel[sheetName];
 
-      _sheet1.appendRow(
+      sheet1.appendRow(
         <String>[
           'Tên',
           'Tên khác',
@@ -140,13 +140,13 @@ class ResultController extends GetxController {
         ],
       );
 
-      final List<Result> _results = loadData(
+      final List<Result> results = loadData(
         label: currLabel.value,
         keyword: currKeyword.value,
       );
 
-      for (Result r in _results) {
-        _sheet1.appendRow(<String>[
+      for (Result r in results) {
+        sheet1.appendRow(<String>[
           r.title ?? '',
           r.subTitle ?? '',
           r.star != null ? r.star.toString() : '',
@@ -161,17 +161,16 @@ class ResultController extends GetxController {
         ]);
       }
 
-      if (_excel.setDefaultSheet(_sheetName) &&
-          _sheetName != _defaultSheetName) {
-        _excel.delete(_defaultSheetName);
+      if (excel.setDefaultSheet(sheetName) && sheetName != defaultSheetName) {
+        excel.delete(defaultSheetName);
       }
 
-      final List<int>? _bytes = _excel.save();
+      final List<int>? bytes = excel.save();
 
-      if (_bytes != null) {
-        final File _file = await File(_saveFilePath).create();
+      if (bytes != null) {
+        final File file = await File(saveFilePath).create();
 
-        await _file.writeAsBytes(_bytes);
+        await file.writeAsBytes(bytes);
       }
 
       await Future.delayed(2.seconds);

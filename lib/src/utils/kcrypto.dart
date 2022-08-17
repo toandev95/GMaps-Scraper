@@ -5,23 +5,25 @@ class Kcrypto {
   static final IV iv = IV.fromLength(16);
 
   static String encrypt(String input) {
-    final Encrypter _encrypter = Encrypter(AES(key));
-    final Encrypted _encrypted = _encrypter.encrypt(
+    final Encrypter encrypter = Encrypter(AES(key));
+    final Encrypted encrypted = encrypter.encrypt(
       input,
       iv: iv,
     );
 
-    return '${_encrypted.base64}++';
+    return '${encrypted.base64}++';
   }
 
   static String decrypt(String input) {
-    final Encrypter _encrypter = Encrypter(AES(key));
-    final Encrypted _encrypted = Encrypted.fromBase64(
+    final Encrypter encrypter = Encrypter(AES(key));
+    final Encrypted encrypted = Encrypted.fromBase64(
       input.substring(0, input.length - 2),
     );
 
-    return _encrypter.decrypt(
-      _encrypted,
+    print(encrypted);
+
+    return encrypter.decrypt(
+      encrypted,
       iv: iv,
     );
   }

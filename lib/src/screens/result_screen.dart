@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
-import 'package:google_maps_scraper_app/src/controllers/controllers.dart';
-import 'package:google_maps_scraper_app/src/utils/extensions.dart';
+import 'package:gmaps_scraper_app/src/controllers/controllers.dart';
+import 'package:gmaps_scraper_app/src/utils/extensions.dart';
 
 class ResultScreen extends GetView<ResultController> {
   const ResultScreen({Key? key}) : super(key: key);

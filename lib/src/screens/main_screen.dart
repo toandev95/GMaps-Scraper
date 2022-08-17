@@ -2,10 +2,10 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-import 'package:google_maps_scraper_app/src/constants/constants.dart';
-import 'package:google_maps_scraper_app/src/controllers/controllers.dart';
-import 'package:google_maps_scraper_app/src/models/models.dart';
-import 'package:google_maps_scraper_app/src/screens/screens.dart';
+import 'package:gmaps_scraper_app/src/constants/constants.dart';
+import 'package:gmaps_scraper_app/src/controllers/controllers.dart';
+import 'package:gmaps_scraper_app/src/models/models.dart';
+import 'package:gmaps_scraper_app/src/screens/screens.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
